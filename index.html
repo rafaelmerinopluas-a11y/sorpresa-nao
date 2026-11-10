@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi Nao hermosa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* Custom Fonts */
+        .font-dancing { font-family: 'Dancing Script', cursive; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+
+        /* Background and Overlay */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fdf2f8; 
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('foto1.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6; /* Subimos la opacidad de 0.25 a 0.6 */
+            filter: blur(2px); /* Reducimos el desenfoque de 8px a 4px */
+            z-index: -2;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            /* Hacemos el degradado más transparente (menor valor en el último número) */
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(253, 242, 248, 0.7));
+            z-index: -1;
+        }
+
+        /* Floating Stars Animation */
+        .floating-emoji {
+            position: absolute;
+            opacity: 0.6;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(180deg); opacity: 0; }
+        }
+
+        /* Music Player Vinyl Spin */
+        .vinyl {
+            animation: spin 3s linear infinite;
+            animation-play-state: paused;
+        }
+        .vinyl.playing {
+            animation-play-state: running;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Heart Burst Animation */
+        .burst-heart {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none;
+            animation: burstOut 1s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes burstOut {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
+        }
+
+        /* Message Reveal */
+        .hidden-message {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.8s ease, opacity 0.8s ease, padding 0.8s ease;
+        }
+        .hidden-message.show {
+            max-height: 500px;
+            opacity: 1;
+            padding: 1.5rem;
+        }
+
+        /* Image Placeholder styling */
+        .photo-frame {
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+        .photo-frame:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+    </style>
+</head>
+<body class="font-inter text-gray-800 antialiased min-h-screen flex flex-col items-center">
+
+    <!-- Backgrounds -->
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+    <div id="emoji-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-lg mx-auto px-6 py-12 relative z-10 flex flex-col items-center text-center">
+        
+        <!-- Custom Music Player UI -->
+        <audio id="bg-audio" src="cancion.mp3" loop preload="auto"></audio>
+        <div class="bg-white/80 backdrop-blur-md rounded-full shadow-lg p-2 flex items-center gap-4 mb-10 w-[280px] border border-white/50">
+            <!-- Vinyl Record -->
+            <div class="relative w-14 h-14 rounded-full bg-black flex items-center justify-center shadow-inner overflow-hidden">
+                <div class="absolute inset-0 bg-[repeating-radial-gradient(circle_at_center,#333_0,#000_2px)] opacity-50"></div>
+                <img id="vinyl-cover" src="foto1.jpg" onerror="this.src='https://placehold.co/100x100/ec4899/ffffff?text=J'" class="w-6 h-6 rounded-full object-cover z-10 vinyl border border-gray-700" alt="Album Cover">
+                <div class="absolute w-2 h-2 bg-white rounded-full z-20 shadow-sm"></div>
+            </div>
+            
+            <!-- Song Info -->
+            <div class="flex-1 text-left">
+                <h3 class="font-semibold text-sm text-gray-900 leading-tight">Juanes - Para Tu Amor</h3>
+                <div class="w-full bg-gray-200 h-1 rounded-full mt-2 relative">
+                    <div class="absolute top-0 left-0 h-1 bg-pink-500 rounded-full w-1/3"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-1">0:45 / 4:05</p>
+            </div>
+            
+            <!-- Play/Pause Button -->
+            <button id="play-btn" class="w-10 h-10 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center hover:bg-pink-100 transition-colors mr-1 shadow-sm">
+                <i class="ph-fill ph-play text-xl" id="play-icon"></i>
+            </button>
+        </div>
+
+        <!-- Photo Gallery (Carousel) -->
+        <div class="relative mb-8 w-72 h-80 mx-auto">
+            <div class="w-full h-full photo-frame bg-white p-3 flex flex-col items-center relative overflow-hidden group">
+                <!-- Se eliminó el placeholder de onerror -->
+                <img id="carousel-img" src="foto1.jpg" alt="Nuestra foto" class="w-full h-full object-cover rounded-xl transition-opacity duration-300">
+                <!-- Navigation -->
+                <button id="prev-btn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-md">
+                    <i class="ph-bold ph-caret-left"></i>
+                </button>
+                <button id="next-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-md">
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+            </div>
+            <!-- Decorative pin/tape -->
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-4 bg-white/40 backdrop-blur-sm rounded shadow-sm rotate-[-2deg]"></div>
+        </div>
+
+        <!-- Text Section -->
+        <h1 class="font-dancing text-5xl md:text-6xl text-gray-900 mb-6 drop-shadow-sm">Para mi Nao hermosa</h1>
+        
+        <p class="text-sm md:text-base text-gray-700 leading-relaxed mb-8 px-4 font-medium">
+            Estoy sumamente feliz y agradecido por tu bonita compañía, te amo mucho. Y que sigamos cumpliendo muchos meses más.
+        </p>
+
+        <h2 class="font-playfair text-3xl md:text-4xl tracking-widest text-gray-900 mb-12">TE AMO</h2>
+
+        <!-- Timer Section -->
+        <div class="mb-12">
+            <div class="flex justify-center gap-4 mb-4">
+                <!-- Months -->
+                <div class="flex flex-col items-center">
+                    <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl w-24 h-24 flex items-center justify-center border border-white">
+                        <span id="months" class="font-playfair text-5xl text-gray-800">04</span>
+                    </div>
+                    <span class="text-xs uppercase tracking-widest text-gray-500 mt-3 font-semibold">Meses</span>
+                </div>
+                <!-- Separator -->
+                <div class="text-4xl font-playfair text-gray-400 mt-6">:</div>
+                <!-- Days -->
+                <div class="flex flex-col items-center">
+                    <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl w-24 h-24 flex items-center justify-center border border-white">
+                        <span id="days" class="font-playfair text-5xl text-gray-800">00</span>
+                    </div>
+                    <span class="text-xs uppercase tracking-widest text-gray-500 mt-3 font-semibold">Días</span>
+                </div>
+            </div>
+
+            <!-- Small Timer (Hours, Mins, Secs) -->
+            <div class="flex justify-center gap-6 text-gray-600">
+                <div class="flex flex-col items-center">
+                    <span id="hours" class="font-playfair text-xl">00</span>
+                    <span class="text-[10px] uppercase tracking-wider text-gray-400">Horas</span>
+                </div>
+                <span class="text-xl font-playfair text-gray-300">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="minutes" class="font-playfair text-xl">00</span>
+                    <span class="text-[10px] uppercase tracking-wider text-gray-400">Mins</span>
+                </div>
+                <span class="text-xl font-playfair text-gray-300">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="seconds" class="font-playfair text-xl">00</span>
+                    <span class="text-[10px] uppercase tracking-wider text-gray-400">Segs</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Surprise Button -->
+        <div class="w-full relative mt-4">
+            <button id="surprise-btn" class="bg-gradient-to-r from-pink-400 to-rose-400 text-white font-medium py-3 px-8 rounded-full shadow-lg shadow-pink-200 hover:shadow-pink-300 hover:scale-105 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                <i class="ph-fill ph-gift text-xl"></i>
+                Toca para una sorpresa
+            </button>
+            
+            <div id="hidden-message" class="hidden-message bg-white/80 backdrop-blur-md rounded-2xl shadow-xl mt-6 border border-pink-100 mx-4">
+                <h3 class="font-dancing text-3xl text-pink-600 mb-2">¡Tu deseo es una orden! 🎟️</h3>
+<p class="text-gray-600 text-sm mb-2">Tienes derecho a un cupón especial. Escribe lo que quieras:</p>
+
+<div class="bg-pink-50 border-2 border-dashed border-pink-300 rounded-lg p-4 my-3 relative overflow-hidden">
+    <div id="cupon-form">
+        <p class="text-gray-800 font-bold tracking-wider mb-2">VALE POR:</p>
+        <input type="text" id="cupon-input" placeholder="Ej: Una ida por helados, ir al cine, un sweet... lo que quieras mi amor" class="w-full bg-white border border-pink-200 rounded p-2 text-sm text-gray-700 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 mb-3 shadow-inner">
+        <button id="sellar-btn" class="bg-pink-400 hover:bg-pink-500 text-white text-sm font-medium py-2 px-4 rounded-full w-full transition-colors shadow-sm">
+            Sellar Cupón
+        </button>
+    </div>
+
+    <!-- Mensaje de éxito que aparece tras hacer clic -->
+    <div id="cupon-success" class="hidden absolute inset-0 bg-pink-50 flex-col items-center justify-center p-4 z-10">
+        <span class="text-3xl mb-1">✅</span>
+        <p class="text-pink-600 font-bold text-sm text-center">¡Cupón Registrado!</p>
+        <p id="cupon-resultado" class="text-gray-800 font-medium text-sm mt-2 text-center italic"></p>
+        <p class="text-gray-600 text-xs text-center mt-3 bg-white/70 p-2 rounded-md">Tómale captura a esta pantalla y mándamela para hacerlo válido. 😉</p>
+    </div>
+</div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. Background Stardust ---
+            const emojis = ['✨', '✦', '🤍', '·']; 
+            const container = document.getElementById('emoji-container');
+
+            function createEmoji() {
+                const emoji = document.createElement('div');
+                emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.classList.add('floating-emoji');
+                
+                const startX = Math.random() * 100;
+                const duration = Math.random() * 5 + 5; 
+                const size = Math.random() * 0.5 + 0.5; // Destellos más pequeños
+                
+                emoji.style.left = `${startX}vw`;
+                emoji.style.animationDuration = `${duration}s`;
+                emoji.style.fontSize = `${size}rem`;
+                
+                container.appendChild(emoji);
+                
+                setTimeout(() => {
+                    emoji.remove();
+                }, duration * 1000);
+            }
+            
+            setInterval(createEmoji, 800);
+            for(let i=0; i<15; i++) setTimeout(createEmoji, Math.random()*2000);
+
+
+            // --- 2. Custom Music Player Logic ---
+            const audio = document.getElementById('bg-audio');
+            const playBtn = document.getElementById('play-btn');
+            const playIcon = document.getElementById('play-icon');
+            const vinyl = document.getElementById('vinyl-cover');
+            let isPlaying = false;
+
+            playBtn.addEventListener('click', () => {
+                isPlaying = !isPlaying;
+                if (isPlaying) {
+                    audio.play();
+                    playIcon.classList.remove('ph-play');
+                    playIcon.classList.add('ph-pause');
+                    vinyl.classList.add('playing');
+                } else {
+                    audio.pause();
+                    playIcon.classList.remove('ph-pause');
+                    playIcon.classList.add('ph-play');
+                    vinyl.classList.remove('playing');
+                }
+            });
+
+            // --- Photo Carousel Logic with Synchronized Background ---
+            const images = [
+                'foto1.jpg',
+                'foto2.jpg',
+                'foto3.jpg',
+                'foto4.jpg',
+                'foto5.jpg',
+                'foto6.jpg',
+                'foto7.jpg',
+                'foto8.jpg',
+                'foto9.jpg',
+                'foto10.jpg',
+            ];
+            let currentImgIndex = 0;
+            const carouselImg = document.getElementById('carousel-img');
+            const bgImage = document.querySelector('.bg-image');
+            
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                currentImgIndex = (currentImgIndex - 1 + images.length) % images.length;
+                carouselImg.style.opacity = 0;
+                setTimeout(() => {
+                    carouselImg.src = images[currentImgIndex];
+                    bgImage.style.backgroundImage = `url('${images[currentImgIndex]}')`; // Sincronización del fondo
+                    carouselImg.style.opacity = 1;
+                }, 150);
+            });
+            
+            document.getElementById('next-btn').addEventListener('click', () => {
+                currentImgIndex = (currentImgIndex + 1) % images.length;
+                carouselImg.style.opacity = 0;
+                setTimeout(() => {
+                    carouselImg.src = images[currentImgIndex];
+                    bgImage.style.backgroundImage = `url('${images[currentImgIndex]}')`; // Sincronización del fondo
+                    carouselImg.style.opacity = 1;
+                }, 150);
+            });
+
+            // --- 3. Timer Logic ---
+            const startDate = new Date('2026-07-10T00:00:00');
+
+            function updateTimer() {
+                const currentDate = new Date();
+                
+                let months = currentDate.getMonth() - startDate.getMonth() + 
+                            (12 * (currentDate.getFullYear() - startDate.getFullYear()));
+                
+                let days = currentDate.getDate() - startDate.getDate();
+                if (days < 0) {
+                    months--;
+                    const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+                    days += prevMonth.getDate();
+                }
+
+                const diff = currentDate - startDate;
+                
+                let hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                let minutes = Math.floor((diff / 1000 / 60) % 60);
+                let seconds = Math.floor((diff / 1000) % 60);
+
+                document.getElementById('months').innerText = String(months).padStart(2, '0');
+                document.getElementById('days').innerText = String(days).padStart(2, '0');
+                document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+            }
+
+            setInterval(updateTimer, 1000);
+            updateTimer(); 
+
+            // --- 4. Surprise Button Animation & Reveal ---
+            const surpriseBtn = document.getElementById('surprise-btn');
+            const hiddenMessage = document.getElementById('hidden-message');
+
+            surpriseBtn.addEventListener('click', (e) => {
+                hiddenMessage.classList.toggle('show');
+                
+                if(hiddenMessage.classList.contains('show')) {
+                    surpriseBtn.innerHTML = '<i class="ph-fill ph-heart text-xl"></i> Ocultar sorpresa';
+                } else {
+                    surpriseBtn.innerHTML = '<i class="ph-fill ph-gift text-xl"></i> Toca para una sorpresa';
+                }
+
+                const rect = surpriseBtn.getBoundingClientRect();
+                const btnX = rect.left + rect.width / 2;
+                const btnY = rect.top + rect.height / 2;
+
+                for (let i = 0; i < 20; i++) {
+                    createBurstHeart(btnX, btnY);
+                }
+            });
+
+            function createBurstHeart(x, y) {
+                const heart = document.createElement('div');
+                heart.innerText = '❤️';
+                heart.classList.add('burst-heart');
+                
+                heart.style.left = `${x}px`;
+                heart.style.top = `${y}px`;
+                
+                const tx = (Math.random() - 0.5) * 300; 
+                const ty = (Math.random() - 0.5) * 300 - 50; 
+                
+                heart.style.setProperty('--tx', `${tx}px`);
+                heart.style.setProperty('--ty', `${ty}px`);
+                
+                document.body.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 1000);
+            }
+            // --- 5. Lógica del Cupón Interactivo ---
+            const sellarBtn = document.getElementById('sellar-btn');
+            const cuponInput = document.getElementById('cupon-input');
+            const cuponForm = document.getElementById('cupon-form');
+            const cuponSuccess = document.getElementById('cupon-success');
+            const cuponResultado = document.getElementById('cupon-resultado');
+
+            if (sellarBtn) {
+                sellarBtn.addEventListener('click', () => {
+                    const deseo = cuponInput.value.trim();
+                    
+                    if (deseo !== "") {
+                        // Si escribió algo, mostramos la pantalla de éxito
+                        cuponResultado.innerText = `Vale por: "${deseo}"`;
+                        cuponForm.style.opacity = '0';
+                        setTimeout(() => {
+                            cuponSuccess.classList.remove('hidden');
+                            cuponSuccess.classList.add('flex');
+                        }, 200);
+                    } else {
+                        // Si está vacío, hacemos que la caja tiemble o se ponga roja
+                        cuponInput.classList.add('border-red-400', 'bg-red-50');
+                        setTimeout(() => {
+                            cuponInput.classList.remove('border-red-400', 'bg-red-50');
+                        }, 800);
+                    }
+                });
+            }
+
+
+        });
+    </script>
+</body>
+</html>
